@@ -123,13 +123,15 @@ stagekit.prototype.setStrobe = function(state, callback) {
 }
 
 stagekit.prototype.setStrobeToggle = function(state, callback) {
-    var strobe;
-    if (state) {
-        strobe = this.accessory.getService('Strobe Light').getCharacteristic(Characteristic.Brightness).value;
+    var on = this.accessory.getService('Strobe Light').getCharacteristic(Characteristic.On).value;
+    if (state && !on) {
+        var strobe = this.accessory.getService('Strobe Light').getCharacteristic(Characteristic.Brightness).value;
+        this.setStrobe(strobe, callback);
+    } else if (!state && on) {
+        this.setStrobe(0, callback);
     } else {
-        strobe = 0;
+        callback();
     }
-    this.setStrobe(strobe, callback);
 }
 
 stagekit.prototype.setRed = function(state, callback) {
@@ -151,13 +153,15 @@ stagekit.prototype.setRed = function(state, callback) {
 }
 
 stagekit.prototype.setRedToggle = function(state, callback) {
-    var red;
-    if (state) {
-        red = this.accessory.getService('Red Lights').getCharacteristic(Characteristic.Brightness).value;
+    var on = this.accessory.getService('Red Lights').getCharacteristic(Characteristic.On).value;
+    if (state && !on) {
+        var red = this.accessory.getService('Red Lights').getCharacteristic(Characteristic.Brightness).value;
+        this.setRed(red, callback);
+    } else if (!state && on) {
+        this.setRed(0, callback);
     } else {
-        red = 0;
+        callback();
     }
-    this.setRed(red, callback);
 }
 
 stagekit.prototype.setYellow = function(state, callback) {
@@ -179,13 +183,15 @@ stagekit.prototype.setYellow = function(state, callback) {
 }
 
 stagekit.prototype.setYellowToggle = function(state, callback) {
-    var yellow;
-    if (state) {
-        yellow = this.accessory.getService('Yellow Lights').getCharacteristic(Characteristic.Brightness).value;
+    var on = this.accessory.getService('Yellow Lights').getCharacteristic(Characteristic.On).value;
+    if (state && !on) {
+        var yellow = this.accessory.getService('Yellow Lights').getCharacteristic(Characteristic.Brightness).value;
+        this.setYellow(yellow, callback);
+    } else if (!state && on) {
+        this.setYellow(0, callback);
     } else {
-        yellow = 0;
+        callback();
     }
-    this.setYellow(yellow, callback);
 }
 
 stagekit.prototype.setGreen = function(state, callback) {
@@ -207,13 +213,15 @@ stagekit.prototype.setGreen = function(state, callback) {
 }
 
 stagekit.prototype.setGreenToggle = function(state, callback) {
-    var green;
-    if (state) {
-        green = this.accessory.getService('Green Lights').getCharacteristic(Characteristic.Brightness).value;
+    var on = this.accessory.getService('Green Lights').getCharacteristic(Characteristic.On).value;
+    if (state && !on) {
+        var green = this.accessory.getService('Green Lights').getCharacteristic(Characteristic.Brightness).value;
+        this.setGreen(green, callback);
+    } else if (!state && on) {
+        this.setGreen(0, callback);
     } else {
-        green = 0;
+        callback();
     }
-    this.setGreen(green, callback);
 }
 
 stagekit.prototype.setBlue = function(state, callback) {
@@ -235,13 +243,15 @@ stagekit.prototype.setBlue = function(state, callback) {
 }
 
 stagekit.prototype.setBlueToggle = function(state, callback) {
-    var blue;
-    if (state) {
-        blue = this.accessory.getService('Blue Lights').getCharacteristic(Characteristic.Brightness).value;
+    var on = this.accessory.getService('Blue Lights').getCharacteristic(Characteristic.On).value;
+    if (state && !on) {
+        var blue = this.accessory.getService('Blue Lights').getCharacteristic(Characteristic.Brightness).value;
+        this.setBlue(blue, callback);
+    } else if (!state && on) {
+        this.setBlue(0, callback);
     } else {
-        blue = 0;
+        callback();
     }
-    this.setBlue(blue, callback);
 }
 
 stagekit.prototype.randomLeds = function() {
