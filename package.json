@@ -1,0 +1,30 @@
+{
+  "name": "homebridge-stagekit",
+  "version": "1.0.0",
+  "description": "Homebridge Plugin for the RockBand StageKit",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Sunoo/homebridge-stagekit.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "pdp",
+    "rockband",
+    "rock band",
+    "stagekit",
+    "stage kit"
+  ],
+  "author": "David Maher",
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Sunoo/homebridge-stagekit/issues"
+  },
+  "homepage": "https://github.com/Sunoo/homebridge-stagekit#readme",
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.3.0"
+  },
+  "dependencies": {
+    "stagekit": ">=1.1.3"
+  }
+}
