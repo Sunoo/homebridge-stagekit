@@ -30,9 +30,11 @@ stagekit.prototype.ledsToInt = function(leds) {
     for (var i = 0; i < leds; i++) {
         binary += '1';
     }
-    for (var i = 0; i < 8 - leds; i++) {
-        var pos = parseInt(Math.random() * binary.length);
-        binary = binary.slice(0, pos) + '0' + binary.slice(pos);
+    if (this.config.random_leds) {
+        for (var i = 0; i < 8 - leds; i++) {
+            var pos = parseInt(Math.random() * binary.length);
+            binary = binary.slice(0, pos) + '0' + binary.slice(pos);
+        }
     }
     return parseInt(binary, 2);
 }
