@@ -10,11 +10,15 @@ Homebridge Plugin for the RockBand StageKit
 Edit your `config.json` accordingly. Configuration sample:
 ```
     "platforms": [{
-        "platform": "stagekit"
+        "platform": "stagekit",
+        "fog_pulse_seconds": 1,
+        "party_mode_seconds": 0.5
     }]
 ```
 
-| Fields             | Description                                                                  | Required |
-|--------------------|------------------------------------------------------------------------------|----------|
-| platform           | Must always be `stagekit`.                                                   | Yes      |
-| eventfile          | The eventfile that represents the StageKit. If missing, it will search.      | No       |
+| Fields               | Description                                                                     | Required |
+|----------------------|---------------------------------------------------------------------------------|----------|
+| platform             | Must always be `stagekit`.                                                      | Yes      |
+| eventfile            | The eventfile that represents the StageKit. (Default: Search for StageKit)      | No       |
+| fog\_pulse\_seconds  | If set, the fog machine will only run for set number of seconds.                | No       |
+| party\_mode\_seconds | If set, enables party mode switch, changing every set number of seconds.        | No       |

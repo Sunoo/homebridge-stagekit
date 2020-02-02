@@ -25,12 +25,21 @@ stagekit.prototype.didFinishLaunching = function() {
     this.addAccessory(this.config.eventfile)
 }
 
-stagekit.prototype.getLeds = function(leds) {
+stagekit.prototype.ledsToInt = function(leds) {
     var binary = '';
     for (var i = 0; i < leds; i++) {
         binary += '1';
     }
+    for (var i = 0; i < 8 - leds; i++) {
+        var pos = parseInt(Math.random() * binary.length);
+        binary = binary.slice(0, pos) + '0' + binary.slice(pos);
+    }
     return parseInt(binary, 2);
+}
+
+stagekit.prototype.intToLeds = function(leds) {
+    var binary = leds.toString(2);
+    return (binary.match(/1/g) || []).length;
 }
 
 stagekit.prototype.panic = function(state, callback) {
@@ -39,7 +48,30 @@ stagekit.prototype.panic = function(state, callback) {
         this.panicTimeout = null;
     }
 
+    if (this.accessory.context.partyMode) {
+        this.accessory.getService('Party Mode')
+            .setCharacteristic(Characteristic.On, false);
+    }
+
     stagekitApi.AllOff();
+
+    this.accessory.getService('Fog Machine')
+        .updateCharacteristic(Characteristic.On, false);
+    this.accessory.getService('Strobe Light')
+        .updateCharacteristic(Characteristic.On, false)
+        .updateCharacteristic(Characteristic.Brightness, 100);
+    this.accessory.getService('Red Lights')
+        .updateCharacteristic(Characteristic.On, false)
+        .updateCharacteristic(Characteristic.Brightness, 100);
+    this.accessory.getService('Yellow Lights')
+        .updateCharacteristic(Characteristic.On, false)
+        .updateCharacteristic(Characteristic.Brightness, 100);
+    this.accessory.getService('Green Lights')
+        .updateCharacteristic(Characteristic.On, false)
+        .updateCharacteristic(Characteristic.Brightness, 100);
+    this.accessory.getService('Blue Lights')
+        .updateCharacteristic(Characteristic.On, false)
+        .updateCharacteristic(Characteristic.Brightness, 100);
 
     if (callback) {
         callback();
@@ -48,25 +80,26 @@ stagekit.prototype.panic = function(state, callback) {
     this.panicTimeout = setTimeout(() => {
         this.accessory.getService('Panic')
             .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Fog Machine')
-            .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Strobe Light')
-            .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Red Lights')
-            .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Yellow Lights')
-            .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Green Lights')
-            .updateCharacteristic(Characteristic.On, false);
-        this.accessory.getService('Blue Lights')
-            .updateCharacteristic(Characteristic.On, false);
         this.panicTimeout = null;
     }, 1000);
 }
 
 stagekit.prototype.setFog = function(state, callback) {
+    if (this.fogTimeout) {
+        clearTimeout(this.fogTimeout);
+        this.fogTimeout = null;
+    }
+
     stagekitApi.SetFog(state);
     callback();
+
+    if (state && this.config.fog_pulse_seconds) {
+        this.fogTimeout = setTimeout(() => {
+            this.accessory.getService('Fog Machine')
+                .setCharacteristic(Characteristic.On, false);
+            this.fogTimeout = null;
+        }, this.config.fog_pulse_seconds * 1000);
+    }
 }
 
 stagekit.prototype.setStrobe = function(state, callback) {
@@ -104,7 +137,7 @@ stagekit.prototype.setRed = function(state, callback) {
     }
 
     var red = Math.ceil(state / 12.5);
-    stagekitApi.SetRed(this.getLeds(red));
+    stagekitApi.SetRed(this.ledsToInt(red));
 
     callback();
 
@@ -132,7 +165,7 @@ stagekit.prototype.setYellow = function(state, callback) {
     }
 
     var yellow = Math.ceil(state / 12.5);
-    stagekitApi.SetYellow(this.getLeds(yellow));
+    stagekitApi.SetYellow(this.ledsToInt(yellow));
 
     callback();
 
@@ -160,7 +193,7 @@ stagekit.prototype.setGreen = function(state, callback) {
     }
 
     var green = Math.ceil(state / 12.5);
-    stagekitApi.SetGreen(this.getLeds(green));
+    stagekitApi.SetGreen(this.ledsToInt(green));
 
     callback();
 
@@ -188,7 +221,7 @@ stagekit.prototype.setBlue = function(state, callback) {
     }
 
     var blue = Math.ceil(state / 12.5);
-    stagekitApi.SetBlue(this.getLeds(blue));
+    stagekitApi.SetBlue(this.ledsToInt(blue));
 
     callback();
 
@@ -207,6 +240,64 @@ stagekit.prototype.setBlueToggle = function(state, callback) {
         blue = 0;
     }
     this.setBlue(blue, callback);
+}
+
+stagekit.prototype.randomLeds = function() {
+    var red = parseInt(Math.random() * 255);
+    var yellow = parseInt(Math.random() * 255);
+    var green = parseInt(Math.random() * 255);
+    var blue = parseInt(Math.random() * 255);
+
+    stagekitApi.SetRed(red);
+    stagekitApi.SetYellow(yellow);
+    stagekitApi.SetGreen(green);
+    stagekitApi.SetBlue(blue);
+
+    this.accessory.getService('Red Lights')
+        .updateCharacteristic(Characteristic.On, true)
+        .updateCharacteristic(Characteristic.Brightness, this.intToLeds(red) * 12.5);
+    this.accessory.getService('Yellow Lights')
+        .updateCharacteristic(Characteristic.On, true)
+        .updateCharacteristic(Characteristic.Brightness, this.intToLeds(yellow) * 12.5);
+    this.accessory.getService('Green Lights')
+        .updateCharacteristic(Characteristic.On, true)
+        .updateCharacteristic(Characteristic.Brightness, this.intToLeds(green) * 12.5);
+    this.accessory.getService('Blue Lights')
+        .updateCharacteristic(Characteristic.On, true)
+        .updateCharacteristic(Characteristic.Brightness, this.intToLeds(blue) * 12.5);
+}
+
+stagekit.prototype.partyMode = function(state, callback) {
+    if (state) {
+        if (!this.partyInterval) {
+            this.partyInterval = setInterval(this.randomLeds.bind(this), this.config.party_mode_seconds * 1000);
+        }
+    } else {
+        if (this.partyInterval) {
+            clearInterval(this.partyInterval);
+            this.partyInterval = null;
+        }
+
+        stagekitApi.SetRed(0);
+        stagekitApi.SetYellow(0);
+        stagekitApi.SetGreen(0);
+        stagekitApi.SetBlue(0);
+
+        this.accessory.getService('Red Lights')
+            .updateCharacteristic(Characteristic.On, false)
+            .updateCharacteristic(Characteristic.Brightness, 100);
+        this.accessory.getService('Yellow Lights')
+            .updateCharacteristic(Characteristic.On, false)
+            .updateCharacteristic(Characteristic.Brightness, 100);
+        this.accessory.getService('Green Lights')
+            .updateCharacteristic(Characteristic.On, false)
+            .updateCharacteristic(Characteristic.Brightness, 100);
+        this.accessory.getService('Blue Lights')
+            .updateCharacteristic(Characteristic.On, false)
+            .updateCharacteristic(Characteristic.Brightness, 100);
+    }
+
+    callback();
 }
 
 stagekit.prototype.configureAccessory = function(accessory) {
@@ -239,14 +330,29 @@ stagekit.prototype.configureAccessory = function(accessory) {
     accessory.getService('Blue Lights').getCharacteristic(Characteristic.On)
         .on('set', this.setBlueToggle.bind(this));
 
+    var party = accessory.getService('Party Mode');
+    if (party != undefined && !this.config.party_mode_seconds) {
+        accessory.removeService(party);
+        party = null;
+    } else if (party == undefined && this.config.party_mode_seconds) {
+        party = accessory.addService(Service.Switch, 'Party Mode', 'Party Mode');
+    }
+    if (party) {
+        party.getCharacteristic(Characteristic.On)
+            .on('set', this.partyMode.bind(this));
+        accessory.context.partyMode = true;
+    } else {
+        accessory.context.partyMode = false;
+    }
+
     var eventfile = stagekitApi.Open(accessory.context.eventfile);
 
     accessory.getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.SerialNumber, eventfile);
 
-    this.panic();
-
     this.accessory = accessory;
+
+    this.panic();
 }
 
 stagekit.prototype.addAccessory = function(eventfile) {
