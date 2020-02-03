@@ -32,7 +32,7 @@ stagekit.prototype.ledsToInt = function(leds) {
     }
     if (this.config.random_leds) {
         for (var i = 0; i < 8 - leds; i++) {
-            var pos = parseInt(Math.random() * binary.length);
+            var pos = Math.round(Math.random() * (binary.length));
             binary = binary.slice(0, pos) + '0' + binary.slice(pos);
         }
     }
@@ -255,10 +255,10 @@ stagekit.prototype.setBlueToggle = function(state, callback) {
 }
 
 stagekit.prototype.randomLeds = function() {
-    var red = parseInt(Math.random() * 255);
-    var yellow = parseInt(Math.random() * 255);
-    var green = parseInt(Math.random() * 255);
-    var blue = parseInt(Math.random() * 255);
+    var red = Math.round(Math.random() * 255);
+    var yellow = Math.round(Math.random() * 255);
+    var green = Math.round(Math.random() * 255);
+    var blue = Math.round(Math.random() * 255);
 
     stagekitApi.SetRed(red);
     stagekitApi.SetYellow(yellow);
