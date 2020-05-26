@@ -1,0 +1,39 @@
+{
+    "pluginAlias": "stagekit",
+    "pluginType": "platform",
+    "singular": true,
+    "headerDisplay": "Homebridge Plugin for the RockBand StageKit.",
+    "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-stagekit/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-stagekit/pulls) on [Project Page](https://github.com/Sunoo/homebridge-stagekit).",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "required": true,
+                "default": "StageKit",
+                "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
+            },
+            "eventfile": {
+                "title": "Eventfile",
+                "type": "string",
+                "description": "The eventfile that represents the StageKit."
+            },
+            "fog_pulse_seconds": {
+                "title": "Fog Pulse Seconds",
+                "type": "number",
+                "description": "If set, the fog machine will only run for set number of seconds."
+            },
+            "party_mode_seconds": {
+                "title": "Party Mode Seconds",
+                "type": "number",
+                "description": "If set, enables party mode switch, changing every set number of seconds."
+            },
+            "random_leds": {
+                "title": "Random LEDs",
+                "type": "boolean",
+                "description": "Choose LEDs randomly instead of sequentially."
+            }
+        }
+    }
+}
