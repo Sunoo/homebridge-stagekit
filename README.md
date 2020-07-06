@@ -4,8 +4,8 @@
 Homebridge Plugin for the RockBand StageKit
 
 ### Installation
-1. Install homebridge using `npm install -g homebridge`.
-2. Install this plugin using `npm install -g homebridge-stagekit --unsafe-perm`.
+1. Install Homebridge using the [official instructions](https://github.com/homebridge/homebridge/wiki).
+2. Install this plugin using `sudo npm install -g homebridge-stagekit --unsafe-perm`.
 3. Update your configuration file. See configuration sample below.
 
 ### Configuration
