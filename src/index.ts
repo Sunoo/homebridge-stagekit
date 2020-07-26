@@ -41,11 +41,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
 
     this.stageKit = new StageKit(config.eventfile);
 
-    api.on(APIEvent.DID_FINISH_LAUNCHING, this.didFinishLaunching.bind(this));
-  }
-
-  didFinishLaunching(): void {
-    this.addAccessory(this.config.eventfile);
+    api.on(APIEvent.DID_FINISH_LAUNCHING, this.addAccessory.bind(this));
   }
 
   ledsToInt(leds: number): number {
@@ -77,11 +73,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       this.panicTimeout = undefined;
     }
 
-    if (this.accessory.context.partyMode) {
-      const party = this.accessory.getService('Party Mode');
-      if (party) {
-        party.setCharacteristic(hap.Characteristic.On, false);
-      }
+    const party = this.accessory.getService('Party Mode');
+    if (party) {
+      party.setCharacteristic(hap.Characteristic.On, false);
     }
 
     this.stageKit.AllOff();
@@ -538,9 +532,6 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     if (party) {
       party.getCharacteristic(hap.Characteristic.On)
         .on('set', this.partyMode.bind(this));
-      accessory.context.partyMode = true;
-    } else {
-      accessory.context.partyMode = false;
     }
 
     const eventfile = this.stageKit.eventfile;
@@ -555,12 +546,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     this.panic();
   }
 
-  addAccessory(eventfile: string): void {
+  addAccessory(): void {
     if (!this.accessory) {
       const uuid = hap.uuid.generate('RockBand StageKit');
       const accessory = new Accessory('StageKit', uuid);
-
-      accessory.context.eventfile = eventfile;
 
       const accInfo = accessory.getService(hap.Service.AccessoryInformation);
       if (accInfo) {
