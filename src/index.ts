@@ -11,7 +11,7 @@ import {
   PlatformAccessoryEvent,
   PlatformConfig
 } from 'homebridge';
-const stagekitApi = require('stagekit'); // eslint-disable-line @typescript-eslint/no-var-requires
+import { StageKit } from 'stagekit';
 
 let hap: HAP;
 let Accessory: typeof PlatformAccessory;
@@ -23,6 +23,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
   private readonly log: Logging;
   private readonly api: API;
   private readonly config: PlatformConfig;
+  private readonly stageKit: StageKit;
   private accessory?: PlatformAccessory;
   private panicTimeout?: NodeJS.Timeout;
   private fogTimeout?: NodeJS.Timeout;
@@ -37,6 +38,8 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     this.log = log;
     this.config = config;
     this.api = api;
+
+    this.stageKit = new StageKit(config.eventfile);
 
     api.on(APIEvent.DID_FINISH_LAUNCHING, this.didFinishLaunching.bind(this));
   }
@@ -81,7 +84,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       }
     }
 
-    stagekitApi.AllOff();
+    this.stageKit.AllOff();
 
     const fog = this.accessory.getService('Fog Machine');
     if (fog) {
@@ -144,7 +147,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       this.fogTimeout = undefined;
     }
 
-    stagekitApi.SetFog(state);
+    this.stageKit.SetFog(state as boolean);
     callback();
 
     if (state && this.config.fog_pulse_seconds) {
@@ -172,7 +175,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const strobeVal = Math.ceil(state as number / 25);
-    stagekitApi.SetStrobe(strobeVal);
+    this.stageKit.SetStrobe(strobeVal);
 
     callback();
 
@@ -221,7 +224,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const redVal = Math.ceil(state as number / 12.5);
-    stagekitApi.SetRed(this.ledsToInt(redVal));
+    this.stageKit.SetRed(this.ledsToInt(redVal));
 
     callback();
 
@@ -270,7 +273,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const yellowVal = Math.ceil(state as number / 12.5);
-    stagekitApi.SetYellow(this.ledsToInt(yellowVal));
+    this.stageKit.SetYellow(this.ledsToInt(yellowVal));
 
     callback();
 
@@ -319,7 +322,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const greenVal = Math.ceil(state as number / 12.5);
-    stagekitApi.SetGreen(this.ledsToInt(greenVal));
+    this.stageKit.SetGreen(this.ledsToInt(greenVal));
 
     callback();
 
@@ -368,7 +371,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const blueVal = Math.ceil(state as number / 12.5);
-    stagekitApi.SetBlue(this.ledsToInt(blueVal));
+    this.stageKit.SetBlue(this.ledsToInt(blueVal));
 
     callback();
 
@@ -415,10 +418,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     const greenVal = Math.round(Math.random() * 255);
     const blueVal = Math.round(Math.random() * 255);
 
-    stagekitApi.SetRed(redVal);
-    stagekitApi.SetYellow(yellowVal);
-    stagekitApi.SetGreen(greenVal);
-    stagekitApi.SetBlue(blueVal);
+    this.stageKit.SetRed(redVal);
+    this.stageKit.SetYellow(yellowVal);
+    this.stageKit.SetGreen(greenVal);
+    this.stageKit.SetBlue(blueVal);
 
     const red = this.accessory.getService('Red Lights');
     if (red) {
@@ -462,10 +465,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
         this.partyInterval = undefined;
       }
 
-      stagekitApi.SetRed(0);
-      stagekitApi.SetYellow(0);
-      stagekitApi.SetGreen(0);
-      stagekitApi.SetBlue(0);
+      this.stageKit.SetRed(0);
+      this.stageKit.SetYellow(0);
+      this.stageKit.SetGreen(0);
+      this.stageKit.SetBlue(0);
 
       const red = this.accessory.getService('Red Lights');
       if (red) {
@@ -540,7 +543,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       accessory.context.partyMode = false;
     }
 
-    const eventfile = stagekitApi.Open(accessory.context.eventfile);
+    const eventfile = this.stageKit.eventfile;
 
     const accInfo = accessory.getService(hap.Service.AccessoryInformation);
     if (accInfo) {
