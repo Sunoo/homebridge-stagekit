@@ -14,11 +14,6 @@
                 "default": "StageKit",
                 "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
             },
-            "eventfile": {
-                "title": "Eventfile",
-                "type": "string",
-                "description": "The eventfile that represents the StageKit."
-            },
             "fog_pulse_seconds": {
                 "title": "Fog Pulse Seconds",
                 "type": "number",

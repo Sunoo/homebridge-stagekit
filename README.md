@@ -1,22 +1,26 @@
 # homebridge-stagekit
+
 [![npm](https://img.shields.io/npm/v/homebridge-stagekit) ![npm](https://img.shields.io/npm/dt/homebridge-stagekit)](https://www.npmjs.com/package/homebridge-stagekit)
 
 Homebridge Plugin for the RockBand StageKit. Currently only supports Linux.
 
-### Installation
+## Installation
+
 1. Install Homebridge using the [official instructions](https://github.com/homebridge/homebridge/wiki).
 2. Install this plugin using `sudo npm install -g homebridge-stagekit --unsafe-perm`.
 3. Update your configuration file. See configuration sample below.
 
 ### Configuration
+
 Edit your `config.json` accordingly. Configuration sample:
-```
-    "platforms": [{
-        "platform": "stagekit",
-        "fog_pulse_seconds": 1,
-        "party_mode_seconds": 0.5,
-        "random_leds": true
-    }]
+
+```json
+"platforms": [{
+    "platform": "stagekit",
+    "fog_pulse_seconds": 1,
+    "party_mode_seconds": 0.5,
+    "random_leds": true
+}]
 ```
 
 | Fields               | Description                                                                     | Required |
