@@ -12,6 +12,7 @@ import {
   PlatformConfig
 } from 'homebridge';
 import { StageKit } from 'stagekit';
+import { StageKitPlatformConfig } from './configTypes';
 
 let hap: HAP;
 let Accessory: typeof PlatformAccessory;
@@ -19,11 +20,11 @@ let Accessory: typeof PlatformAccessory;
 const PLUGIN_NAME = 'homebridge-stagekit';
 const PLATFORM_NAME = 'stagekit';
 
-class StagekitPlatform implements DynamicPlatformPlugin {
+class StageKitPlatform implements DynamicPlatformPlugin {
   private readonly log: Logging;
   private readonly api: API;
-  private readonly config: PlatformConfig;
-  private readonly stageKit: StageKit;
+  private readonly config: StageKitPlatformConfig;
+  private readonly stageKit?: StageKit;
   private accessory?: PlatformAccessory;
   private panicTimeout?: NodeJS.Timeout;
   private fogTimeout?: NodeJS.Timeout;
@@ -36,10 +37,15 @@ class StagekitPlatform implements DynamicPlatformPlugin {
 
   constructor(log: Logging, config: PlatformConfig, api: API) {
     this.log = log;
-    this.config = config;
+    this.config = config as unknown as StageKitPlatformConfig;
     this.api = api;
 
-    this.stageKit = new StageKit(config.eventfile);
+    try {
+      this.stageKit = new StageKit();
+    } catch (ex) {
+      this.log.error('Error connecting to StageKit: ' + ex);
+      return;
+    }
 
     api.on(APIEvent.DID_FINISH_LAUNCHING, this.addAccessory.bind(this));
   }
@@ -78,7 +84,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       party.setCharacteristic(hap.Characteristic.On, false);
     }
 
-    this.stageKit.AllOff();
+    this.stageKit?.AllOff();
 
     const fog = this.accessory.getService('Fog Machine');
     if (fog) {
@@ -141,7 +147,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       this.fogTimeout = undefined;
     }
 
-    this.stageKit.SetFog(state as boolean);
+    this.stageKit?.SetFog(state as boolean);
     callback();
 
     if (state && this.config.fog_pulse_seconds) {
@@ -169,7 +175,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const strobeVal = Math.ceil(state as number / 25);
-    this.stageKit.SetStrobe(strobeVal);
+    this.stageKit?.SetStrobe(strobeVal);
 
     callback();
 
@@ -201,9 +207,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       } else {
         callback();
       }
+    } else {
+      callback();
     }
-
-    callback();
   }
 
   setRed(state: Nullable<CharacteristicValue>, callback: CharacteristicSetCallback): void {
@@ -218,7 +224,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const redVal = Math.ceil(state as number / 12.5);
-    this.stageKit.SetRed(this.ledsToInt(redVal));
+    this.stageKit?.SetRed(this.ledsToInt(redVal));
 
     callback();
 
@@ -250,9 +256,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       } else {
         callback();
       }
+    } else {
+      callback();
     }
-
-    callback();
   }
 
   setYellow(state: Nullable<CharacteristicValue>, callback: CharacteristicSetCallback): void {
@@ -267,7 +273,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const yellowVal = Math.ceil(state as number / 12.5);
-    this.stageKit.SetYellow(this.ledsToInt(yellowVal));
+    this.stageKit?.SetYellow(this.ledsToInt(yellowVal));
 
     callback();
 
@@ -299,9 +305,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       } else {
         callback();
       }
+    } else {
+      callback();
     }
-
-    callback();
   }
 
   setGreen(state: Nullable<CharacteristicValue>, callback: CharacteristicSetCallback): void {
@@ -316,7 +322,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const greenVal = Math.ceil(state as number / 12.5);
-    this.stageKit.SetGreen(this.ledsToInt(greenVal));
+    this.stageKit?.SetGreen(this.ledsToInt(greenVal));
 
     callback();
 
@@ -348,9 +354,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       } else {
         callback();
       }
+    } else {
+      callback();
     }
-
-    callback();
   }
 
   setBlue(state: Nullable<CharacteristicValue>, callback: CharacteristicSetCallback): void {
@@ -365,7 +371,7 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     }
 
     const blueVal = Math.ceil(state as number / 12.5);
-    this.stageKit.SetBlue(this.ledsToInt(blueVal));
+    this.stageKit?.SetBlue(this.ledsToInt(blueVal));
 
     callback();
 
@@ -397,9 +403,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       } else {
         callback();
       }
+    } else {
+      callback();
     }
 
-    callback();
   }
 
   randomLeds(): void {
@@ -412,10 +419,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
     const greenVal = Math.round(Math.random() * 255);
     const blueVal = Math.round(Math.random() * 255);
 
-    this.stageKit.SetRed(redVal);
-    this.stageKit.SetYellow(yellowVal);
-    this.stageKit.SetGreen(greenVal);
-    this.stageKit.SetBlue(blueVal);
+    this.stageKit?.SetRed(redVal);
+    this.stageKit?.SetYellow(yellowVal);
+    this.stageKit?.SetGreen(greenVal);
+    this.stageKit?.SetBlue(blueVal);
 
     const red = this.accessory.getService('Red Lights');
     if (red) {
@@ -459,10 +466,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
         this.partyInterval = undefined;
       }
 
-      this.stageKit.SetRed(0);
-      this.stageKit.SetYellow(0);
-      this.stageKit.SetGreen(0);
-      this.stageKit.SetBlue(0);
+      this.stageKit?.SetRed(0);
+      this.stageKit?.SetYellow(0);
+      this.stageKit?.SetGreen(0);
+      this.stageKit?.SetBlue(0);
 
       const red = this.accessory.getService('Red Lights');
       if (red) {
@@ -523,10 +530,10 @@ class StagekitPlatform implements DynamicPlatformPlugin {
       .on('set', this.setBlueToggle.bind(this));
 
     let party = accessory.getService('Party Mode');
-    if (party != undefined && !this.config.party_mode_seconds) {
+    if (party && !this.config.party_mode_seconds) {
       accessory.removeService(party);
       party = undefined;
-    } else if (party == undefined && this.config.party_mode_seconds) {
+    } else if (!party && this.config.party_mode_seconds) {
       party = accessory.addService(hap.Service.Switch, 'Party Mode', 'Party Mode');
     }
     if (party) {
@@ -534,10 +541,9 @@ class StagekitPlatform implements DynamicPlatformPlugin {
         .on('set', this.partyMode.bind(this));
     }
 
-    const eventfile = this.stageKit.eventfile;
-
+    const eventfile = this.stageKit?.eventfile;
     const accInfo = accessory.getService(hap.Service.AccessoryInformation);
-    if (accInfo) {
+    if (accInfo && eventfile) {
       accInfo.setCharacteristic(hap.Characteristic.SerialNumber, eventfile);
     }
 
@@ -582,5 +588,5 @@ export = (api: API): void => {
   hap = api.hap;
   Accessory = api.platformAccessory;
 
-  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, StagekitPlatform);
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, StageKitPlatform);
 };
