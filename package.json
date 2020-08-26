@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge StageKit",
   "name": "homebridge-stagekit",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Homebridge Plugin for the RockBand StageKit",
   "main": "dist/index.js",
   "repository": {
@@ -18,6 +18,9 @@
   ],
   "author": "David Maher",
   "license": "GPL-2.0-or-later",
+  "os": [
+    "linux"
+  ],
   "bugs": {
     "url": "https://github.com/Sunoo/homebridge-stagekit/issues"
   },
