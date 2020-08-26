@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge StageKit",
   "name": "homebridge-stagekit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Homebridge Plugin for the RockBand StageKit",
   "main": "dist/index.js",
   "repository": {
@@ -20,6 +20,24 @@
   "license": "GPL-2.0-or-later",
   "os": [
     "linux"
+  ],
+  "funding": [
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/sunookitsune"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/sunoo"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/Sunoo"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Sunoo"
+    }
   ],
   "bugs": {
     "url": "https://github.com/Sunoo/homebridge-stagekit/issues"
@@ -54,7 +72,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=100",
+    "node": ">=10",
     "homebridge": ">=1.0.0"
   },
   "dependencies": {
