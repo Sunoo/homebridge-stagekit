@@ -37,7 +37,7 @@ class StageKitPlatform implements DynamicPlatformPlugin {
 
   constructor(log: Logging, config: PlatformConfig, api: API) {
     this.log = log;
-    this.config = config as unknown as StageKitPlatformConfig;
+    this.config = config as StageKitPlatformConfig;
     this.api = api;
 
     try {
@@ -458,7 +458,7 @@ class StageKitPlatform implements DynamicPlatformPlugin {
 
     if (state) {
       if (!this.partyInterval) {
-        this.partyInterval = setInterval(this.randomLeds.bind(this), this.config.party_mode_seconds * 1000);
+        this.partyInterval = setInterval(this.randomLeds.bind(this), this.config.party_mode_seconds! * 1000);
       }
     } else {
       if (this.partyInterval) {
