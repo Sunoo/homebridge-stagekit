@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge StageKit",
   "name": "homebridge-stagekit",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Homebridge Plugin for the RockBand StageKit",
   "main": "dist/index.js",
   "repository": {
@@ -74,6 +74,6 @@
     "homebridge": ">=1.0.0"
   },
   "dependencies": {
-    "stagekit": "^1.2.2"
+    "rbstagekit": "^1.2.2"
   }
 }
